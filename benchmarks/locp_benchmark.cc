@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     }
     try
     {
-        locp::CSVParser p(argv[1]);
+        locp::CSVParser<> p(argv[1]);
         size_t field_count = 0;
         const uint8_t *field_start = nullptr;
         const uint8_t *field_end = nullptr;

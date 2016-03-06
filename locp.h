@@ -37,6 +37,13 @@ namespace locp
 namespace
 {
 
+// Basic configuration with no quoting.
+template <uint8_t col_delimiter_, uint8_t row_delimiter_> struct no_quote_config
+{
+    static const uint8_t col_delimiter = col_delimiter_;
+    static const uint8_t row_delimiter = row_delimiter_;
+};
+
 // Does its best to fill a buffer.
 size_t read_all_(uint8_t *buffer, size_t buffer_size, int fd)
 {
@@ -58,12 +65,13 @@ size_t read_all_(uint8_t *buffer, size_t buffer_size, int fd)
 
 // Finds the delimiters in a buffer and records its positions.
 size_t find_delimiters_(uint16_t *delimiter_pos, size_t delimiter_pos_size,
-                        const uint8_t *buffer, size_t buffer_len)
+                        const uint8_t *buffer, size_t buffer_len,
+                        uint8_t col_delimiter, uint8_t row_delimiter)
 {
     // FIXME: DO A LESS NAIVE IMPLEMENTATION
     size_t j = 0;
     for (size_t i = 0; i < buffer_len; i++)
-        if (buffer[i] == ',' || buffer[i] == '\n')
+        if (buffer[i] == col_delimiter || buffer[i] == row_delimiter)
             delimiter_pos[j++] = i;
     delimiter_pos[j++] = buffer_len;
     return j;
@@ -71,7 +79,7 @@ size_t find_delimiters_(uint16_t *delimiter_pos, size_t delimiter_pos_size,
 }
 
 // CSV parser class.
-class CSVParser
+template <typename config = no_quote_config<',', '\n'>> class CSVParser
 {
     // Buffer.
     uint8_t buffer_[(1 << 16) - 1];
@@ -105,7 +113,8 @@ class CSVParser
                       sizeof(buffer_) - num_remaining_bytes, fd_);
         buffer_len_ = num_remaining_bytes + read_bytes;
         delimiter_pos_len_ = find_delimiters_(
-            delimiter_pos_, sizeof(delimiter_pos_), buffer_, buffer_len_);
+            delimiter_pos_, sizeof(delimiter_pos_), buffer_, buffer_len_,
+            config::col_delimiter, config::row_delimiter);
         field_num_ = 0;
         more_data_available_ = (buffer_len_ == sizeof(buffer_));
     }
@@ -139,11 +148,11 @@ class CSVParser
             return false;
 
         // if the next field ends delimited by the end of the buffer, there is
-        // no more data, the field has length 0 and the last delimite is '\n',
-        // there are no more fields
+        // no more data, the field has length 0 and the last delimite is a row
+        // delimiter, there are no more fields
         if (field_num_ + 1 == delimiter_pos_len_ && !more_data_available_ &&
             delimiter_pos_[field_num_ - 1] + 1 == delimiter_pos_[field_num_] &&
-            buffer_[delimiter_pos_[field_num_ - 1]] == '\n')
+            buffer_[delimiter_pos_[field_num_ - 1]] == config::row_delimiter)
             return false;
 
         // if the next field ends delimited by the end of the buffer, we refill
