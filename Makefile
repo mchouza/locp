@@ -32,7 +32,7 @@ benchmarks/fccp_benchmark: benchmarks/fccp_benchmark.cc benchmarks/third-party/f
 	@$(CXX) $(CXXFLAGS) benchmarks/fccp_benchmark.cc $(LDFLAGS) -o $@
 
 benchmark: benchmarks/orders.gen.csv benchmarks/locp_benchmark benchmarks/fccp_benchmark
-	@python -B -O benchmarks/do_benchmarks.py benchmarks/orders.gen.csv benchmarks/*_benchmark
+	@python -B benchmarks/do_benchmarks.py benchmarks/orders.gen.csv benchmarks/*_benchmark
 
 clean:
 	@rm -f benchmarks/orders.gen.csv benchmarks/*_benchmark
