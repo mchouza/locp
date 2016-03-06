@@ -22,12 +22,13 @@ CXXFLAGS := -std=c++11 -O3 -Wall -pedantic-errors
 LDFLAGS := -lpthread
 
 benchmarks/orders.gen.csv:
-	@python -B -O benchmarks/generate_orders_csv.py $@
+	@python -B benchmarks/generate_orders_csv.py $@
 
 benchmarks/locp_benchmark: benchmarks/locp_benchmark.cc locp.h
 	@$(CXX) $(CXXFLAGS) -I. benchmarks/locp_benchmark.cc $(LDFLAGS) -o $@
 
 benchmarks/fccp_benchmark: benchmarks/fccp_benchmark.cc benchmarks/third-party/fast-cpp-csv-parser/csv.h
+	git submodule update --init benchmarks/third-party/fast-cpp-csv-parser/
 	@$(CXX) $(CXXFLAGS) benchmarks/fccp_benchmark.cc $(LDFLAGS) -o $@
 
 benchmark: benchmarks/orders.gen.csv benchmarks/locp_benchmark benchmarks/fccp_benchmark
