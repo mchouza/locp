@@ -34,6 +34,9 @@ benchmarks/fccp_benchmark: benchmarks/fccp_benchmark.cc benchmarks/third-party/f
 benchmark: benchmarks/orders.gen.csv benchmarks/locp_benchmark benchmarks/fccp_benchmark
 	@python -B benchmarks/do_benchmarks.py benchmarks/orders.gen.csv benchmarks/*_benchmark
 
+format:
+	@clang-format-3.5 -i locp.h benchmarks/*.cc 
+
 clean:
 	@rm -f benchmarks/orders.gen.csv benchmarks/*_benchmark
 
