@@ -18,7 +18,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-CXXFLAGS := -std=c++11 -O3 -Wall -pedantic-errors
+CXXFLAGS := -std=c++11 -O3 -g -Wall -pedantic-errors
 LDFLAGS := -lpthread
 
 benchmarks/orders.gen.csv:
