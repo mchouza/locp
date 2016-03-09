@@ -6,17 +6,17 @@ This is a CSV parser in development, following the principle that the fastest co
 
 ## Benchmarks
 
-Some initial benchmark results (obtained using `make benchmark`):
+The current benchmark results, comparing against [Ben Strasser's Fast C++ CSV Parser](https://github.com/ben-strasser/fast-cpp-csv-parser) are:
 
     $ make benchmark
     benchmarks/locp_benchmark
-      min: 313.51 ms
-      avg: 314.31 ms
-      max: 314.94 ms
+      min: 146.82 ms
+      avg: 147.27 ms
+      max: 148.28 ms
     benchmarks/fccp_benchmark
-      min: 489.99 ms
-      avg: 493.06 ms
-      max: 497.90 ms
+      min: 490.25 ms
+      avg: 497.43 ms
+      max: 508.17 ms
 
 The system used for the tests is an old quad-core Sandy Bridge:
 
