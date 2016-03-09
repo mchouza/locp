@@ -63,8 +63,7 @@ size_t read_all_(uint8_t *buffer, size_t buffer_size, int fd)
     return p - buffer;
 }
 
-// Finds the delimiters in a buffer and records its positions (assumes the
-// buffer is 64 bit-aligned).
+// Finds the delimiters in a buffer and records its positions.
 size_t find_delimiters_(uint16_t *delimiter_pos, size_t delimiter_pos_size,
                         const uint8_t *buffer, size_t buffer_len,
                         uint8_t col_delimiter, uint8_t row_delimiter)
@@ -81,14 +80,19 @@ size_t find_delimiters_(uint16_t *delimiter_pos, size_t delimiter_pos_size,
     uint64_t col_delimiter_mask = col_delimiter * mask_0x01;
     uint64_t row_delimiter_mask = row_delimiter * mask_0x01;
 
-    // processes 8 bytes at a time
-    for (i = 0; i < buffer_len; i += 8)
-    {
-        // accesses the buffer as a 64 bit integer
-        const uint64_t *b = (const uint64_t *)&buffer[i];
+    // final section processing loop
+    for (; (uintptr_t)&buffer[i] % 8 != 0; i++)
+        if (buffer[i] == col_delimiter || buffer[i] == row_delimiter)
+            delimiter_pos[j++] = i;
 
+    // processes 8 bytes at a time
+    for (; i < buffer_len; i += 8)
+    {
         // based on
         // https://graphics.stanford.edu/~seander/bithacks.html#ZeroInWord
+
+        // accesses the buffer as a 64 bit integer
+        const uint64_t *b = (const uint64_t *)&buffer[i];
 
         // gets the matches as null bytes
         uint64_t col_matches_as_0x00 = *b ^ col_delimiter_mask;
