@@ -89,7 +89,7 @@ size_t find_delimiters_(uint16_t *delimiter_pos, size_t delimiter_pos_size,
     for (; i < buffer_len; i += 8)
     {
         // based on
-        // https://graphics.stanford.edu/~seander/bithacks.html#ZeroInWord
+        // https://graphics.stanford.edu/~seander/bithacks.html#HasLessInWord
 
         // accesses the buffer as a 64 bit integer
         const uint64_t *b = (const uint64_t *)&buffer[i];
@@ -100,10 +100,10 @@ size_t find_delimiters_(uint16_t *delimiter_pos, size_t delimiter_pos_size,
 
         // leaves 0x80 in those positions
         uint64_t col_matches_as_0x80 =
-            ((col_matches_as_0x00 & mask_0x7f) - mask_0x01) &
+            (mask_0x80 - (col_matches_as_0x00 & mask_0x7f)) &
             ~col_matches_as_0x00 & mask_0x80;
         uint64_t row_matches_as_0x80 =
-            ((row_matches_as_0x00 & mask_0x7f) - mask_0x01) &
+            (mask_0x80 - (row_matches_as_0x00 & mask_0x7f)) &
             ~row_matches_as_0x00 & mask_0x80;
         uint64_t matches_as_0x80 = col_matches_as_0x80 | row_matches_as_0x80;
 
