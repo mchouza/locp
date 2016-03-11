@@ -80,13 +80,13 @@ size_t find_delimiters_(uint16_t *delimiter_pos, size_t delimiter_pos_size,
     uint64_t col_delimiter_mask = col_delimiter * mask_0x01;
     uint64_t row_delimiter_mask = row_delimiter * mask_0x01;
 
-    // final section processing loop
+    // initial section processing loop
     for (; (uintptr_t)&buffer[i] % 8 != 0; i++)
         if (buffer[i] == col_delimiter || buffer[i] == row_delimiter)
             delimiter_pos[j++] = i;
 
     // processes 8 bytes at a time
-    for (; i < buffer_len; i += 8)
+    for (; i + 7 < buffer_len; i += 8)
     {
         // based on
         // https://graphics.stanford.edu/~seander/bithacks.html#HasLessInWord
