@@ -27,8 +27,10 @@ benchmarks/orders.gen.csv:
 benchmarks/locp_benchmark: benchmarks/locp_benchmark.cc locp.h
 	@$(CXX) $(CXXFLAGS) -I. benchmarks/locp_benchmark.cc $(LDFLAGS) -o $@
 
-benchmarks/fccp_benchmark: benchmarks/fccp_benchmark.cc benchmarks/third-party/fast-cpp-csv-parser/csv.h
+benchmarks/third-party/fast-cpp-csv-parser/csv.h:
 	git submodule update --init benchmarks/third-party/fast-cpp-csv-parser/
+
+benchmarks/fccp_benchmark: benchmarks/fccp_benchmark.cc benchmarks/third-party/fast-cpp-csv-parser/csv.h
 	@$(CXX) $(CXXFLAGS) benchmarks/fccp_benchmark.cc $(LDFLAGS) -o $@
 
 benchmark: benchmarks/orders.gen.csv benchmarks/locp_benchmark benchmarks/fccp_benchmark
