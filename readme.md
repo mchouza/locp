@@ -10,39 +10,31 @@ The current benchmark results, comparing against [Ben Strasser's Fast C++ CSV Pa
 
     $ make benchmark
     benchmarks/locp_benchmark
-      min: 146.82 ms
-      avg: 147.27 ms
-      max: 148.28 ms
+      min: 166.05 ms
+      avg: 172.22 ms
+      max: 179.23 ms
     benchmarks/fccp_benchmark
-      min: 490.25 ms
-      avg: 497.43 ms
-      max: 508.17 ms
+      min: 584.32 ms
+      avg: 589.50 ms
+      max: 597.63 ms
+    benchmarks/locp_best_benchmark
+      min: 196.35 ms
+      avg: 198.62 ms
+      max: 205.09 ms
+    benchmarks/locp_base_benchmark
+      min: 299.48 ms
+      avg: 306.10 ms
+      max: 312.83 ms
 
-The system used for the tests is an old quad-core Sandy Bridge:
+The system used for the tests is a 2015 MacBook Air with a dual-core i5:
+    
+    $ sysctl -n machdep.cpu.brand_string 
+    Intel(R) Core(TM) i5-5250U CPU @ 1.60GHz
 
-    $ grep 'processor\|\(model name\)' /proc/cpuinfo 
-    processor	: 0
-    model name	: Intel(R) Core(TM) i7-2600K CPU @ 3.40GHz
-    processor	: 1
-    model name	: Intel(R) Core(TM) i7-2600K CPU @ 3.40GHz
-    processor	: 2
-    model name	: Intel(R) Core(TM) i7-2600K CPU @ 3.40GHz
-    processor	: 3
-    model name	: Intel(R) Core(TM) i7-2600K CPU @ 3.40GHz
-    processor	: 4
-    model name	: Intel(R) Core(TM) i7-2600K CPU @ 3.40GHz
-    processor	: 5
-    model name	: Intel(R) Core(TM) i7-2600K CPU @ 3.40GHz
-    processor	: 6
-    model name	: Intel(R) Core(TM) i7-2600K CPU @ 3.40GHz
-    processor	: 7
-    model name	: Intel(R) Core(TM) i7-2600K CPU @ 3.40GHz
+The compiler used is the version of Clang included in Mac OS X 10.11.6:
 
-The compiler used is the version of GCC included in Ubuntu 14.04:
-
-    $ gcc --version
-    gcc (Ubuntu 4.8.4-2ubuntu1~14.04) 4.8.4
-    Copyright (C) 2013 Free Software Foundation, Inc.
-    This is free software; see the source for copying conditions.  There is NO
-    warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
+    $ clang++ --version
+    Apple LLVM version 7.3.0 (clang-703.0.31)
+    Target: x86_64-apple-darwin15.6.0
+    Thread model: posix
+    InstalledDir: /Library/Developer/CommandLineTools/usr/bin

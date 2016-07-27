@@ -18,6 +18,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+CXX := clang++
 CXXFLAGS := -std=c++11 -O3 -g -Wall -pedantic-errors
 LDFLAGS := -lpthread
 
@@ -27,17 +28,23 @@ benchmarks/orders.gen.csv:
 benchmarks/locp_benchmark: benchmarks/locp_benchmark.cc locp.h
 	@$(CXX) $(CXXFLAGS) -I. benchmarks/locp_benchmark.cc $(LDFLAGS) -o $@
 
+benchmarks/locp_base_benchmark: benchmarks/locp_benchmark.cc locp.h
+	@$(CXX) $(CXXFLAGS) -arch i386 -I. benchmarks/locp_benchmark.cc $(LDFLAGS) -o $@
+
+benchmarks/locp_best_benchmark: benchmarks/locp_benchmark.cc locp.h
+	@$(CXX) $(CXXFLAGS) -march=native -I. benchmarks/locp_benchmark.cc $(LDFLAGS) -o $@
+
 benchmarks/third-party/fast-cpp-csv-parser/csv.h:
 	git submodule update --init benchmarks/third-party/fast-cpp-csv-parser/
 
 benchmarks/fccp_benchmark: benchmarks/fccp_benchmark.cc benchmarks/third-party/fast-cpp-csv-parser/csv.h
 	@$(CXX) $(CXXFLAGS) benchmarks/fccp_benchmark.cc $(LDFLAGS) -o $@
 
-benchmark: benchmarks/orders.gen.csv benchmarks/locp_benchmark benchmarks/fccp_benchmark
+benchmark: benchmarks/orders.gen.csv benchmarks/locp_benchmark benchmarks/locp_base_benchmark benchmarks/locp_best_benchmark benchmarks/fccp_benchmark
 	@python -B benchmarks/do_benchmarks.py benchmarks/orders.gen.csv benchmarks/*_benchmark
 
 format:
-	@clang-format-3.5 -i locp.h benchmarks/*.cc 
+	@clang-format -i locp.h benchmarks/*.cc 
 
 clean:
 	@rm -f benchmarks/orders.gen.csv benchmarks/*_benchmark
