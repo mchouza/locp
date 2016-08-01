@@ -10,21 +10,21 @@ The current benchmark results, comparing against [Ben Strasser's Fast C++ CSV Pa
 
     $ make benchmark
     benchmarks/locp_benchmark
-      min: 166.05 ms
-      avg: 172.22 ms
-      max: 179.23 ms
+      min: 146.58 ms
+      avg: 149.15 ms
+      max: 150.65 ms
     benchmarks/fccp_benchmark
-      min: 584.32 ms
-      avg: 589.50 ms
-      max: 597.63 ms
+      min: 662.00 ms
+      avg: 675.33 ms
+      max: 686.79 ms
     benchmarks/locp_best_benchmark
-      min: 196.35 ms
-      avg: 198.62 ms
-      max: 205.09 ms
+      min: 128.81 ms
+      avg: 134.67 ms
+      max: 137.74 ms
     benchmarks/locp_base_benchmark
-      min: 299.48 ms
-      avg: 306.10 ms
-      max: 312.83 ms
+      min: 161.36 ms
+      avg: 171.61 ms
+      max: 187.40 ms
 
 The system used for the tests is a 2015 MacBook Air with a dual-core i5:
     

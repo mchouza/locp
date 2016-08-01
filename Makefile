@@ -22,16 +22,18 @@ CXX := clang++
 CXXFLAGS := -std=c++11 -O3 -g -Wall -pedantic-errors
 LDFLAGS := -lpthread
 
+HEADER_FILES = locp.h locp_base.h locp_sse2.h locp_avx2.h
+
 benchmarks/orders.gen.csv:
 	@python -B benchmarks/generate_orders_csv.py $@
 
-benchmarks/locp_benchmark: benchmarks/locp_benchmark.cc locp.h
+benchmarks/locp_benchmark: benchmarks/locp_benchmark.cc $(HEADER_FILES)
 	@$(CXX) $(CXXFLAGS) -I. benchmarks/locp_benchmark.cc $(LDFLAGS) -o $@
 
-benchmarks/locp_base_benchmark: benchmarks/locp_benchmark.cc locp.h
+benchmarks/locp_base_benchmark: benchmarks/locp_benchmark.cc $(HEADER_FILES)
 	@$(CXX) $(CXXFLAGS) -arch i386 -I. benchmarks/locp_benchmark.cc $(LDFLAGS) -o $@
 
-benchmarks/locp_best_benchmark: benchmarks/locp_benchmark.cc locp.h
+benchmarks/locp_best_benchmark: benchmarks/locp_benchmark.cc $(HEADER_FILES)
 	@$(CXX) $(CXXFLAGS) -march=native -I. benchmarks/locp_benchmark.cc $(LDFLAGS) -o $@
 
 benchmarks/third-party/fast-cpp-csv-parser/csv.h:

@@ -21,7 +21,63 @@
 #ifndef LOCP_AVX2_H
 #define LOCP_AVX2_H
 
-// FIXME: DO SOMETHING REAL
-#include "locp_base.h"
+#include <x86intrin.h>
+
+namespace locp
+{
+// Basic configuration with no quoting.
+template <uint8_t col_delimiter_, uint8_t row_delimiter_> struct no_quote_policy
+{
+    // Column delimiter constant.
+    static const uint8_t col_delimiter = col_delimiter_;
+
+    // Row delimiter constant.
+    static const uint8_t row_delimiter = row_delimiter_;
+
+    // Finds the delimiters in a buffer and records its positions.
+    static size_t find_delimiters(uint16_t *delimiter_pos,
+                                  size_t delimiter_pos_size,
+                                  const uint8_t *buffer, size_t buffer_len)
+    {
+        // input index
+        size_t i = 0;
+        // output index
+        size_t j = 0;
+
+        // initial section processing loop
+        for (; (uintptr_t)&buffer[i] % 32 != 0; i++)
+            if (buffer[i] == col_delimiter || buffer[i] == row_delimiter)
+                delimiter_pos[j++] = i;
+
+        // creates the masks
+        __m256i col_mask = _mm256_set1_epi8(col_delimiter);
+        __m256i row_mask = _mm256_set1_epi8(row_delimiter);
+
+        // processes 32 bytes at a time
+        for (; i + 32 < buffer_len; i += 32)
+        {
+            __m256i *b = (__m256i *)&buffer[i];
+            __m256i col_matches = _mm256_cmpeq_epi8(*b, col_mask);
+            __m256i row_matches = _mm256_cmpeq_epi8(*b, row_mask);
+            __m256i all_matches = _mm256_or_si256(col_matches, row_matches);
+            int all_matches_bits = _mm256_movemask_epi8(all_matches);
+            while (all_matches_bits != 0)
+            {
+                delimiter_pos[j++] = i + __builtin_ctzll(all_matches_bits);
+                all_matches_bits &= all_matches_bits - 1;
+            }
+        }
+
+        // final section processing loop
+        for (; i < buffer_len; i++)
+            if (buffer[i] == col_delimiter || buffer[i] == row_delimiter)
+                delimiter_pos[j++] = i;
+        delimiter_pos[j++] = buffer_len;
+
+        // returns the number of delimiters
+        return j;
+    }
+};
+}
 
 #endif
