@@ -20,7 +20,8 @@ if __name__ == '__main__':
 			start = time.time()
 			out = subprocess.check_output([bfp, csv_fpath])
 			end = time.time()
-			assert out == '30000000\n', 'unexpected output for %s' % bfp
+			if out != '30000000\n':
+                            sys.stderr.write('unexpected output for %s\n' % bfp)
 			if bfp not in times:
 				times[bfp] = []
 			times[bfp].append((end - start) * 1000.0)
