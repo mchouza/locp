@@ -21,6 +21,7 @@
 #ifndef LOCP_AVX2_H
 #define LOCP_AVX2_H
 
+#include <stdio.h>
 #include <x86intrin.h>
 
 namespace locp
@@ -45,7 +46,7 @@ template <uint8_t col_delimiter_, uint8_t row_delimiter_> struct no_quote_policy
         size_t j = 0;
 
         // initial section processing loop
-        for (; (uintptr_t)&buffer[i] % 32 != 0; i++)
+        for (; (uintptr_t)&buffer[i] % 64 != 0; i++)
             if (buffer[i] == col_delimiter || buffer[i] == row_delimiter)
                 delimiter_pos[j++] = i;
 
@@ -53,19 +54,31 @@ template <uint8_t col_delimiter_, uint8_t row_delimiter_> struct no_quote_policy
         __m256i col_mask = _mm256_set1_epi8(col_delimiter);
         __m256i row_mask = _mm256_set1_epi8(row_delimiter);
 
-        // processes 32 bytes at a time
-        for (; i + 32 < buffer_len; i += 32)
+        // processes 64 bytes at a time
+        for (; i + 64 < buffer_len; i += 64)
         {
             __m256i *b = (__m256i *)&buffer[i];
-            __m256i col_matches = _mm256_cmpeq_epi8(*b, col_mask);
-            __m256i row_matches = _mm256_cmpeq_epi8(*b, row_mask);
-            __m256i all_matches = _mm256_or_si256(col_matches, row_matches);
-            int all_matches_bits = _mm256_movemask_epi8(all_matches);
-            while (all_matches_bits != 0)
+            __m256i col_matches_lo = _mm256_cmpeq_epi8(b[0], col_mask);
+            __m256i row_matches_lo = _mm256_cmpeq_epi8(b[0], row_mask);
+            __m256i all_matches_lo = _mm256_or_si256(col_matches_lo, row_matches_lo);
+            uint32_t all_matches_lo_bits = _mm256_movemask_epi8(all_matches_lo);
+            size_t all_matches_lo_count = __builtin_popcount(all_matches_lo_bits);
+            for (size_t k = 0; k < all_matches_lo_count; k++)
             {
-                delimiter_pos[j++] = i + __builtin_ctzll(all_matches_bits);
-                all_matches_bits &= all_matches_bits - 1;
+                delimiter_pos[j + k] = i + __builtin_ctz(all_matches_lo_bits);
+                all_matches_lo_bits &= all_matches_lo_bits - 1;
             }
+            __m256i col_matches_hi = _mm256_cmpeq_epi8(b[1], col_mask);
+            __m256i row_matches_hi = _mm256_cmpeq_epi8(b[1], row_mask);
+            __m256i all_matches_hi = _mm256_or_si256(col_matches_hi, row_matches_hi);
+            uint32_t all_matches_hi_bits = _mm256_movemask_epi8(all_matches_hi);
+            size_t all_matches_hi_count = __builtin_popcount(all_matches_hi_bits);
+            for (size_t k = 0; k < all_matches_hi_count; k++)
+            {
+                delimiter_pos[j + all_matches_lo_count + k] = i + 32 + __builtin_ctz(all_matches_hi_bits);
+                all_matches_hi_bits &= all_matches_hi_bits - 1;
+            }
+            j += all_matches_lo_count + all_matches_hi_count;
         }
 
         // final section processing loop
