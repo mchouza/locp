@@ -2,3 +2,4 @@ orders.gen.csv
 *.swp
 *dSYM
 *_benchmark
+.DS_Store
