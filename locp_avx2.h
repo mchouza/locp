@@ -21,7 +21,6 @@
 #ifndef LOCP_AVX2_H
 #define LOCP_AVX2_H
 
-#include <stdio.h>
 #include <x86intrin.h>
 
 namespace locp
